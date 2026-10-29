@@ -1,0 +1,18 @@
+I'm wrapping a C event library with ctypes. The library lets you register a handler that it calls later from its own event loop:
+
+    typedef void (*event_handler)(int event_id, const char *payload, void *user_data);
+
+    void evlib_register(event_handler handler, void *user_data);
+    void evlib_run_once(void);   /* dispatches all pending events to the registered handler */
+    void evlib_post(int event_id, const char *payload);  /* queues an event; copies payload */
+
+Please write:
+1. a minimal C implementation of this library (a simple fixed-size queue is fine) and the gcc command to build `libevlib.so`,
+2. a Python wrapper class `EventLoop` using ctypes with methods `on_event(func)` to register a Python function `func(event_id: int, payload: str)`, `post(event_id, payload)`, and `run_once()`.
+
+Usage I want:
+
+    loop = EventLoop()
+    loop.on_event(lambda eid, p: print(eid, p))
+    loop.post(1, "hello")
+    loop.run_once()

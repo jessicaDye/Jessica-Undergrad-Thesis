@@ -1,0 +1,9 @@
+How do I build a list of tuples from C in a Python extension? I need a function that splits a list into fixed-size chunks:
+
+    import chunker
+    chunker.chunks([1, 2, 3, 4, 5, 6, 7], 3)
+    # [(1, 2, 3), (4, 5, 6), (7,)]
+
+The last chunk can be shorter. `n` must be a positive int, otherwise raise ValueError. The input can be large (millions of elements) so I'd like it to be reasonably fast, which is why I'm doing it in C instead of Python.
+
+Please write the complete `chunker.c` and a setup.py.

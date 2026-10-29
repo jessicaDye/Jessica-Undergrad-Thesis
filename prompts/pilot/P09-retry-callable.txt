@@ -1,0 +1,20 @@
+I want a tiny C extension function `retry(func, attempts)` in a module called `cretry`. It calls `func()` with no arguments up to `attempts` times:
+
+- if a call returns normally, return its result immediately
+- if a call raises an exception that is a subclass of `Exception`, try again
+- if all attempts fail, re-raise the exception from the last attempt (with its original traceback)
+- `attempts` must be >= 1, otherwise raise ValueError
+
+Basically the C equivalent of:
+
+    def retry(func, attempts):
+        if attempts < 1:
+            raise ValueError("attempts must be >= 1")
+        for i in range(attempts):
+            try:
+                return func()
+            except Exception:
+                if i == attempts - 1:
+                    raise
+
+Please give me the C source and setup.py. I'm on Python 3.12.

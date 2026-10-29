@@ -1,0 +1,7 @@
+I'm porting a config-file parser to a C extension. I want the module (`cconf`) to define its own exception type `cconf.ConfigError` (subclass of ValueError) and a function `parse_line(line: str, lineno: int)` that parses lines of the form `key = value`:
+
+- returns a tuple `(key, value)` with surrounding whitespace stripped
+- returns None for blank lines and lines starting with `#`
+- raises `cconf.ConfigError` with a message like `"line 12: missing '='"` or `"line 12: empty key"` for malformed lines
+
+Users should be able to do `except cconf.ConfigError:` and also `except ValueError:`. Can you write the C module (including the module init that creates the exception type) and a setup.py? Target is Python 3.10+.

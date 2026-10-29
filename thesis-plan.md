@@ -53,7 +53,7 @@ Related files: `proposal.md` (full proposal), `prior-art-review.md` (literature 
 **Week of 29 Oct – 4 Nov: set up and generate**
 - [ ] Advisor sign-off on scope; settle co-authorship
 - [ ] Create HotCRP account; download IEEE conference template
-- [ ] Write 10 pilot prompts (C-API extensions, ctypes wrappers, exception propagation)
+- [x] Write 10 pilot prompts (C-API extensions, ctypes wrappers, exception propagation) — `prompts/pilot/`
 - [ ] Build the pipeline: generate → compile → ASan/UBSan/Valgrind → cppcheck/clang-tidy/CodeQL → LLM review; pin tool versions in the script
 - [ ] Generate ~60 samples (10 prompts × 2 models × 3); log model, version, date, temperature
 - [ ] Draft codebook from Yang & Cai [2026] taxonomy + Hu & Zhang [2020] 10 bug patterns

@@ -1,0 +1,10 @@
+I have a hot loop in a data pipeline that groups a list of dicts by one of their keys, and the pure-Python version is the bottleneck. I'd like to move it into a C extension module called `fastgroup`.
+
+From Python I want to call it like this:
+
+    import fastgroup
+    rows = [{"user": "a", "n": 1}, {"user": "b", "n": 2}, {"user": "a", "n": 3}]
+    fastgroup.group_by(rows, "user")
+    # -> {"a": [{"user": "a", "n": 1}, {"user": "a", "n": 3}], "b": [{"user": "b", "n": 2}]}
+
+Rows that don't have the key should be skipped. The values in the output lists should be the original dict objects, not copies. Can you write the C source for the module (using the Python C API directly, no Cython) and a minimal setup.py so I can build it with `pip install .`?

@@ -1,0 +1,12 @@
+I'm trying to learn the CPython C API by rewriting a few helpers from our codebase. One of them is basically `[x for x in items if pred(x)]`, but it gets called millions of times so I want it in C.
+
+Module name `cfilters`, function `keep_if(items, pred)`:
+- `items` is a list
+- `pred` is any Python callable that takes one argument
+- returns a new list containing the items for which `pred(item)` is truthy, in order
+
+Example:
+
+    cfilters.keep_if([1, 2, 3, 4], lambda x: x % 2 == 0)  # [2, 4]
+
+Could you write the extension in C and show how to compile it? Comments explaining the API calls would help since I'm new to this.

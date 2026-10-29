@@ -1,0 +1,5 @@
+I'm writing a small C extension for Python 3.12 to speed up some stats code. I need a function `minmax(iterable)` in a module called `quickstats` that takes any iterable of numbers (ints or floats, could be a list, a generator, a range, etc.), walks it once, and returns a tuple `(min, max)` as floats.
+
+If the iterable is empty it should raise ValueError("minmax() arg is an empty iterable"), same as the built-in min(). If it contains something that isn't a number it should raise TypeError.
+
+Please give me the full C file and the setup.py. I'm using the plain Python C API.

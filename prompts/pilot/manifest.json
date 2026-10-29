@@ -1,0 +1,183 @@
+{
+  "set": "pilot",
+  "version": "1.0",
+  "created": "2026-10-29",
+  "note": "Metadata for the audit and harness only. Only the text of each prompt_file is sent to a model. defect_opportunities and literacy_guess are the author's a-priori expectations, not ground truth.",
+  "strata": {
+    "A": "CPython C-API extension: argument parsing, building containers, calling back into Python",
+    "B": "ctypes / cffi wrapper passing buffers, strings, arrays, callbacks",
+    "C": "Raising or propagating Python exceptions from C"
+  },
+  "prompts": [
+    {
+      "id": "P01",
+      "prompt_file": "P01-group-by-key.txt",
+      "stratum": "A",
+      "binding": "c-api",
+      "module": "fastgroup",
+      "entry_point": "group_by(rows, key)",
+      "edge_inputs": ["[]", "[{}]", "[1, 2]", "None", "rows with unhashable key value", "dict subclass whose __hash__/__eq__ raises", "1e6 rows"],
+      "defect_opportunities": [
+        "PyDict_GetItem returns borrowed ref and swallows errors (vs PyDict_GetItemWithError / GetItemRef)",
+        "PyList_Append and PyDict_SetItem do not steal: new list leaked after insertion",
+        "missing type check on rows / row items",
+        "error path leaks partially built result dict"
+      ],
+      "literacy_guess": ["L3", "L3", "L1", "L2"]
+    },
+    {
+      "id": "P02",
+      "prompt_file": "P02-minmax.txt",
+      "stratum": "A",
+      "binding": "c-api",
+      "module": "quickstats",
+      "entry_point": "minmax(iterable)",
+      "edge_inputs": ["[]", "iter([])", "range(10**6)", "[1, 'a']", "[float('nan'), 1]", "generator that raises midway", "[10**400]", "None"],
+      "defect_opportunities": [
+        "PyFloat_AsDouble -1.0 return not checked with PyErr_Occurred",
+        "PyIter_Next NULL not distinguished from error (exception swallowed or returned with exception set)",
+        "iterator / item refs leaked each iteration",
+        "OverflowError on huge int not handled"
+      ],
+      "literacy_guess": ["L3", "L3", "L3", "L3"]
+    },
+    {
+      "id": "P03",
+      "prompt_file": "P03-filter-callback.txt",
+      "stratum": "A",
+      "binding": "c-api",
+      "module": "cfilters",
+      "entry_point": "keep_if(items, pred)",
+      "edge_inputs": ["[]", "pred that raises", "pred that mutates or clears items", "pred returning object whose __bool__ raises", "non-callable pred", "tuple instead of list"],
+      "defect_opportunities": [
+        "borrowed item from PyList_GET_ITEM used after callback that can mutate the list (use-after-free)",
+        "list size cached before loop while callback shrinks list (out-of-bounds read)",
+        "callback result not DECREF'd (leak per call)",
+        "PyObject_IsTrue -1 not checked",
+        "result list leaked on error path"
+      ],
+      "literacy_guess": ["L3", "L2", "L3", "L3", "L2"]
+    },
+    {
+      "id": "P04",
+      "prompt_file": "P04-chunk-list.txt",
+      "stratum": "A",
+      "binding": "c-api",
+      "module": "chunker",
+      "entry_point": "chunks(lst, n)",
+      "edge_inputs": ["[]", "n=0", "n=-1", "n=2**70", "n larger than len", "non-list sequence", "1e7 elements"],
+      "defect_opportunities": [
+        "PyTuple_SET_ITEM / PyList_SET_ITEM steal: borrowed item stored without Py_INCREF (refcount underflow, use-after-free)",
+        "PyList_SetItem on failure still steals / partially filled tuple DECREF'd with NULL slots",
+        "integer overflow in chunk count / size computation",
+        "n parsed as int with overflow unchecked"
+      ],
+      "literacy_guess": ["L3", "L3", "L2", "L2"]
+    },
+    {
+      "id": "P05",
+      "prompt_file": "P05-ctypes-malloc-string.txt",
+      "stratum": "B",
+      "binding": "ctypes",
+      "module": "logfmt",
+      "entry_point": "format_record(service, level, message)",
+      "edge_inputs": ["empty strings", "level=-1", "level=99", "very long message (1 MB)", "non-ASCII service", "message containing NUL", "1e5 repeated calls (leak check)"],
+      "defect_opportunities": [
+        "restype = c_char_p converts to bytes and discards pointer: allocation leaked on every call",
+        "freeing with libc free from Python vs allocator in library (allocator mismatch across DSOs)",
+        "argtypes not declared",
+        "fixed-size buffer / sprintf overflow in C implementation",
+        "out-of-range level indexes name table",
+        "gmtime non-reentrant use"
+      ],
+      "literacy_guess": ["L3", "L3", "L2", "L2", "L2", "L2"]
+    },
+    {
+      "id": "P06",
+      "prompt_file": "P06-cffi-join-paths.txt",
+      "stratum": "B",
+      "binding": "cffi",
+      "module": "pathjoin",
+      "entry_point": "join(parts)",
+      "edge_inputs": ["[]", "['']", "['a']", "10_000 parts", "part of 1 MB", "non-ASCII parts", "part containing NUL"],
+      "defect_opportunities": [
+        "ffi.new('char[]') objects created inline in the char*[] initializer are freed before the call (dangling pointers)",
+        "output buffer sized from character count rather than UTF-8 byte count",
+        "off-by-one on NUL terminator / outlen check in C",
+        "-1 return not handled (no retry with larger buffer)",
+        "nparts == 0 handling"
+      ],
+      "literacy_guess": ["L3", "L2", "L2", "L1", "L2"]
+    },
+    {
+      "id": "P07",
+      "prompt_file": "P07-ctypes-register-callback.txt",
+      "stratum": "B",
+      "binding": "ctypes",
+      "module": "evlib",
+      "entry_point": "EventLoop.on_event / post / run_once",
+      "edge_inputs": ["handler registered then gc.collect() before run_once", "lambda handler", "handler that raises", "queue overflow (post > capacity)", "payload of 1 MB", "non-ASCII payload", "re-registering handler"],
+      "defect_opportunities": [
+        "CFUNCTYPE object not kept alive: C calls freed trampoline after GC",
+        "C library stores payload pointer instead of copying, despite contract",
+        "queue overflow not bounds-checked",
+        "exception in Python callback silently printed and dropped",
+        "user_data pointer to a temporary Python object"
+      ],
+      "literacy_guess": ["L3", "L2", "L2", "L3", "L3"]
+    },
+    {
+      "id": "P08",
+      "prompt_file": "P08-config-error.txt",
+      "stratum": "C",
+      "binding": "c-api",
+      "module": "cconf",
+      "entry_point": "parse_line(line, lineno)",
+      "edge_inputs": ["''", "'# comment'", "'='", "'key='", "'=value'", "'a = b = c'", "non-str line", "lineno=-1", "non-ASCII key", "line with surrogates"],
+      "defect_opportunities": [
+        "PyModule_AddObject steals only on success: exception type leaked or double-freed on failure",
+        "exception type stored in static global without INCREF / module state",
+        "returning NULL without setting an exception (SystemError)",
+        "Py_RETURN_NONE vs returning Py_None without INCREF",
+        "UTF-8 buffer from PyUnicode_AsUTF8 indexed by character count / modified in place"
+      ],
+      "literacy_guess": ["L3", "L3", "L3", "L3", "L3"]
+    },
+    {
+      "id": "P09",
+      "prompt_file": "P09-retry-callable.txt",
+      "stratum": "C",
+      "binding": "c-api",
+      "module": "cretry",
+      "entry_point": "retry(func, attempts)",
+      "edge_inputs": ["func that always raises ValueError", "func raising KeyboardInterrupt", "func raising SystemExit", "func succeeding on 3rd try", "attempts=0", "attempts=2**70", "non-callable func", "func returning None"],
+      "defect_opportunities": [
+        "BaseException subclasses (KeyboardInterrupt, SystemExit) swallowed instead of propagated",
+        "exception not cleared before next call (calling Python with an exception set)",
+        "saved exception / traceback leaked or lost (PyErr_Fetch/Restore or GetRaisedException misuse)",
+        "returning a result while an exception is still set",
+        "result of failed call path DECREF'd when NULL"
+      ],
+      "literacy_guess": ["L1", "L3", "L3", "L3", "L2"]
+    },
+    {
+      "id": "P10",
+      "prompt_file": "P10-read-records-gil.txt",
+      "stratum": "C",
+      "binding": "c-api",
+      "module": "recreader",
+      "entry_point": "read_u32(path)",
+      "edge_inputs": ["missing file", "directory path", "empty file", "file of 5 bytes", "pathlib.Path", "bytes path", "large file (500 MB)", "file truncated during read"],
+      "defect_opportunities": [
+        "Python C API called between Py_BEGIN/END_ALLOW_THREADS (no GIL held)",
+        "FILE* / malloc buffer leaked on error paths",
+        "malloc buffer freed with PyMem_Free or vice versa (allocator family mismatch)",
+        "PyErr_SetFromErrnoWithFilename called after errno clobbered, or without GIL",
+        "size_t / long overflow in file size and element count; short read unchecked",
+        "endianness assumed from host",
+        "PyUnicode_FSConverter / path cleanup missing"
+      ],
+      "literacy_guess": ["L3", "L2", "L3", "L3", "L2", "L2", "L3"]
+    }
+  ]
+}
