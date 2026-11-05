@@ -3,21 +3,27 @@
 **Memory-Model Literacy and the Human Review of AI-Generated Code at the Python/C Boundary**
 
 Jessica Dye · Niagara University · Honors thesis, defense Spring 2027
-Last updated: 29 October 2026
+Last updated: 5 November 2026 (scope trimmed to undergraduate-honors scale; the earlier version is in git history)
 
-Related files: `proposal.md` (full proposal), `prior-art-review.md` (literature and introduction scaffold)
+Related files: `proposal.md` (full proposal, written for the earlier, larger design), `prior-art-review.md` (literature and introduction scaffold), `paper/main.tex` (HUGS draft)
 
 ---
 
 ## 1. Research question
 
-**Main RQ.** When AI generates code that crosses the Python/C memory-management boundary, which defects survive automated review? What kind of memory-model literacy does a human reviewer need to catch them?
+### Guiding question
 
-| | Sub-question | Part |
-|---|---|---|
-| **RQ1** | Which defects in LLM-generated Python/C boundary code survive the combined automated tier (sanitizers, static analysis, LLM review)? | 1 |
-| **RQ2** | For each surviving defect, which literacy level is required to recognize it? | 1 |
-| **RQ3** | Among undergraduates, does performance on a three-level literacy test predict detection of those defects better than years of experience does? How well calibrated is their confidence? | 2 (pilot) |
+> **As AI becomes increasingly capable of writing and debugging software, what happens when both the developer and the AI are working with abstractions built on lower-level systems that the developer doesn't understand?**
+
+**Stance.** The thesis takes a pro-AI position. The question isn't whether to use AI tools or Python. It's what human understanding is needed to oversee them when something goes wrong beneath the abstraction. The risk is a hypothesis to test, not a conclusion.
+
+### Sub-questions (how the thesis answers it)
+
+| | Sub-question | Method | Status |
+|---|---|---|---|
+| **SQ1** | How much of the Python AI and scientific stack is built on native code? | Repository line counts by file extension, vendored code excluded | **Done** (Aug 2026): NumPy 55.7%, CPython 47.4%, PyTorch 34.5% |
+| **SQ2** | Which defects in AI-generated Python/C code do automated tools, AI reviewers included, miss? What level of literacy does each missed defect need? | Study 1: small corpus | Prompts written; tools installed |
+| **SQ3** | Does a developer's understanding of the memory model predict whether they catch what the tools miss? Does their confidence match their accuracy? | Study 2: small student pilot | After IRB |
 
 ### Core construct: three levels of memory-model literacy
 
@@ -29,141 +35,154 @@ Related files: `proposal.md` (full proposal), `prior-art-review.md` (literature 
 
 **Key framing:** reference counting *is* CPython's garbage collector. At the boundary, the GC's bookkeeping becomes the programmer's job.
 
-**Hypothesis.** The residue that survives automated review is dominated by L3 defects. L3 depends on L2 and can't be inferred from L1 alone.
+**Garbage collection doesn't eliminate memory-related vulnerabilities; it relocates them.** This is the misconception the L1 → L3 gap captures: "Python has a GC, so memory isn't my problem." Ways the guarantee runs out:
+1. **Native code sits outside it.** C extensions, ctypes/cffi, and the buffer protocol all bypass the collector. This is the core of the thesis [Staicu et al., USENIX Security 2023, "Bilingual Problems"].
+2. **The runtime itself is C.** CPython, and the collector itself, are written in an unsafe language, so a bug there is a memory bug.
+3. **Leaks still happen in managed code.** References kept alive by mistake (caches, globals, closures) cause unbounded memory growth, which is a reliability and denial-of-service risk.
+4. **Collector edge cases.** Reference cycles, finalizers (`__del__`) that resurrect objects, and callbacks that run mid-operation (the P03/P07 hazards).
+5. **Concurrency.** Free-threaded CPython (PEP 703, 3.13+) changes how reference counting works under threads. Extensions written for the GIL era can break there.
 
-**Positioning.** Khalid et al. [S&P 2027] and Edmundson et al. [ESSoS 2013] found that years of experience don't predict detection. RQ3 tests whether a specific, teachable literacy does.
+*TODO: find a citable source for each of 2–5 before using them in the thesis. Only Staicu et al. is verified in our files.*
+
+**Theory link:** *notional machines* [Sorva 2013]. Students can't review what they can't picture, and the abstraction hides the machine. The thesis asks which parts of the hidden machine (L1, L2, L3) a reviewer actually needs.
+
+**Hypothesis.** The defects that survive automated review are mostly L3. L3 depends on L2 and can't be inferred from L1 alone.
+
+**The real question underneath:** if an agent makes a mistake, who catches it? There are three candidate catchers: tests and sanitizers, another AI, or a human who understands the machine. Fixing a bug is often easy once it's found. The hard parts are *noticing* it and *judging* whether a proposed fix is right.
 
 ---
 
-## 2. Targets and deadlines
+## 2. Scope: what "exceptionally good undergraduate" means here
+
+The depth comes from the idea, not the volume. That means one sharp question, two small, well-run studies, clear writing, and honest limits. Everything else becomes future work.
+
+| Keep (the depth) | Kept small | Future work (grad school) |
+|---|---|---|
+| L1/L2/L3 construct | Corpus: 10–15 prompts × 2 models × 3 samples | 30–40 prompts × 3–4 models |
+| Dependency-stack argument (SQ1) | Tools: sanitizers + debug CPython + 2 static analyzers + 1 LLM reviewer | CodeQL, Valgrind (Linux), more LLM reviewers |
+| Motivating example (the hand-written stolen-reference bug) | Student pilot: ~15–30 participants, simple statistics | Regression models with random effects; larger samples |
+| One careful audit with a codebook | Second coder on ~20% if available | Full double-coding of every sample |
+| | | Write/optimize-task arm (participants use AI to speed up Python in C), unless the advisor prefers it *instead of* the read task |
+| | | Other boundaries: JNI, cgo, Rust FFI |
+
+Not in scope: building a new library, extension, or security-testing framework. The study uses existing tools on existing AI output. Code examples only illustrate.
+
+---
+
+## 3. Study design
+
+### Study 1 — Corpus (SQ2; no IRB)
+
+1. **Prompts.** 10 pilot prompts exist (`prompts/pilot/`). They're realistic developer requests in Stack Overflow style, with no security hints, across three strata: C-API extensions, ctypes/cffi wrappers, and exception propagation. Add up to 5 more for the thesis.
+2. **Generation.** Two models, Claude and GPT, with 3 samples per prompt (≈60 for 10 prompts). Log the model, version, date and settings. The corpus is frozen and released.
+   - *Collection route, still open:* the API (`pipeline/generate.py`, needs keys) or by hand in the chat apps (Temporary Chat, recording the model name and date). By hand is free but less reproducible; say so in the methods.
+3. **Automated tier**, with versions pinned in `pipeline/requirements.lock`:
+   - AddressSanitizer + UBSan (Apple clang 17) and a **debug CPython 3.12.16** (refcount assertions), run on edge-case inputs from `manifest.json`.
+   - Static analysis: cppcheck 2.22.0, clang-tidy 23.1.4.
+   - LLM review: **Gemini**, from a vendor that didn't generate the code, so no model reviews its own output.
+   - Valgrind is dropped because it doesn't run on Apple Silicon; ASan covers the same classes. Leaks are checked with refcount deltas and macOS `leaks`. CodeQL is future work.
+4. **Ground truth.** Jessica audits every sample with a codebook (Yang & Cai 2026 taxonomy + Hu & Zhang 2020 patterns). A defect counts if it's **reproduced** (a sanitizer or assertion fires) or if two coders agree.
+   - *Second coder:* ask the advisor to code ~12 samples. If no one is available, report single-coder labels backed by reproduction, and defer κ to future work. Do **not** use an LLM as the second coder, since it's part of the tool tier.
+5. **Residue.** Defects that every tool missed. Code each one L1/L2/L3.
+
+### Study 2 — Student pilot (SQ3; IRB required)
+
+- **Participants:** ~15–30 undergraduates, CS1 through seniors. Never recruited from a class Jessica teaches, TAs or grades. The advisor or another instructor announces the study, and responses are anonymous.
+- **Literacy test:** a short L1/L2/L3 test built from existing items. L1 comes from aliasing quizzes and Kaczmarczyk et al. 2010; L2 from Almansoori et al. 2023 / Lam et al. 2022; L3 is new, drawn from the Study 1 defects.
+- **Task:** read and review about 8–12 real defective snippets from the Study 1 residue, plus clean controls [Fulton et al. 2024]. Everyone is told to look for security problems [Braz et al. 2022]. No AI review is shown [Tufano et al. 2025].
+- **Confidence:** one rating per verdict.
+- **Background:** courses taken, years of programming, and where memory management was learned.
+- **Analysis (kept simple):** detection rate by literacy level; correlation of L1/L2/L3 scores and of years of experience with detection; a confidence-vs-accuracy (calibration) plot. Report it as a pilot with effect sizes and confidence intervals.
+
+### Context, not a study: curriculum snapshot
+
+Briefly describe where Niagara and 3–5 peer programs teach memory management (which courses, which language). This takes one or two pages and needs no new data collection. It supports the education argument without becoming a curriculum study.
+
+### Defeat conditions (stated in the paper)
+
+- Automation catches almost everything → little residue; the case for L2/L3 weakens.
+- L1 predicts detection as well as L3 → GC-level literacy is enough.
+- The LLM reviewer alone matches the full tier → the human role becomes "verifying the verifier."
+- No predictor works → replicates Edmundson et al. and Khalid et al. at the boundary; still reportable.
+
+**Counterargument to address:** "Only a few specialists need L3, like mechanics vs. drivers." The answer comes from the data: if AI writes boundary bugs often and tools miss them, a few specialists won't scale.
+
+---
+
+## 4. Targets and deadlines
 
 | Venue | What | Deadline | Notes |
 |---|---|---|---|
-| **HUGS 2027** @ ICSE, Dublin | 3-page extended abstract, IEEE template, includes refs | **Fri 13 Nov 2026, 23:59 AoE** (= Sat 14 Nov, 6:59 AM ET) | Notification 11 Dec. Camera-ready 29 Jan 2027. Workshop 27 Apr 2027. Submit at icse2027-hugs.hotcrp.com |
-| ICSE 2027 SRC *(optional)* | 800 words, 2 pp + 1 p refs, single-authored | Fri 13 Nov 2026 | Needs ACM student membership. Must differ from HUGS by ≥30%. One SRC per program year |
-| CHI 2027 workshops, Pittsburgh *(fallback / follow-on)* | Varies by workshop | ~11 Feb 2027 | Calls posted 17 Dec 2026. Drivable |
+| **HUGS 2027** @ ICSE, Dublin | 3-page extended abstract, IEEE, refs included | **Fri 13 Nov 2026, 23:59 AoE** (= Sat 14 Nov, 6:59 AM ET) | Draft in `paper/`. Notification 11 Dec; camera-ready 29 Jan; workshop 27 Apr. icse2027-hugs.hotcrp.com |
+| ICSE 2027 SRC *(optional)* | 800 words, single-authored | Fri 13 Nov 2026 | Probably skip this year; scope is already full |
+| CHI 2027 workshops, Pittsburgh | Varies | ~11 Feb 2027 | Good fit for the human-oversight (HCI) side. Calls posted 17 Dec |
 | Thesis defense | Full thesis | Spring 2027 | |
 
 ---
 
-## 3. Schedule
+## 5. Schedule
 
-### Phase 1 — HUGS submission (now → 13 Nov)
+### Now → HUGS (13 Nov)
 
-**Week of 29 Oct – 4 Nov: set up and generate**
-- [ ] Advisor sign-off on scope; settle co-authorship
-- [ ] Create HotCRP account; download IEEE conference template
-- [x] Write 10 pilot prompts (C-API extensions, ctypes wrappers, exception propagation) — `prompts/pilot/`
-- [ ] Build the pipeline: generate → compile → ASan/UBSan/Valgrind → cppcheck/clang-tidy/CodeQL → LLM review; pin tool versions in the script
-- [ ] Generate ~60 samples (10 prompts × 2 models × 3); log model, version, date, temperature
-- [ ] Draft codebook from Yang & Cai [2026] taxonomy + Hu & Zhang [2020] 10 bug patterns
+The HUGS abstract is a **research plan plus the motivating example**. It doesn't need pilot data. If time allows, a mini-pilot (10 samples, one per prompt) adds a small preliminary table.
 
-**Week of 5 – 10 Nov: audit and draft**
-- [ ] Run the automated tier on every sample; record which tool caught what
-- [ ] Manual audit of all samples; second coder on ~20%; compute Cohen's κ
-- [ ] Identify the residue (missed by every tool); code each defect L1 / L2 / L3
-- [ ] Draft the abstract (see §6 for page budget)
-- [ ] Verify preprint status of cited papers (Khalid et al., Yang & Cai, OMPL)
+- [x] 10 pilot prompts — `prompts/pilot/`
+- [x] Toolchain installed and pinned; ASan and the debug CPython tested on a known bug
+- [x] Motivating example run (cppcheck and clang-tidy miss it; release CPython crashes silently)
+- [x] First full HUGS draft — `paper/main.tex` (3 pages)
+- [ ] **Fri 6 Nov — advisor:** co-authorship; draft read on 11 Nov; second coder; trimmed scope; read task vs. write task; whether plan-only is right for HUGS
+- [ ] Check the HUGS CFP: anonymity rules, AI-disclosure policy
+- [ ] Verify preprint status: Khalid et al., Yang & Cai, OMPL, Firouzi & Ghafari
+- [ ] Novelty check: ACM DL / IEEE Xplore / Google Scholar, logging the queries
+- [ ] *(Optional)* mini-pilot: 10 samples
+- [ ] Wed 11 Nov — advisor read; revise
+- [ ] Thu 12 Nov — submit
 
-**11 – 13 Nov: review and submit**
-- [ ] Advisor read; revise
-- [ ] Check format: 3 pages incl. refs, IEEE template, anonymity rules per CFP
-- [ ] Submit (aim for 12 Nov)
-
-*If doing the SRC:* ACM student membership, eligibility check, 800-word single-authored version.
-
-**Bottleneck:** the manual audit and second coder. Pipeline must be producing samples by the weekend of 31 Oct.
-
-### Phase 2 — Thesis (after submission)
+### After HUGS
 
 | When | Work |
 |---|---|
-| Mid–late Nov | Submit IRB protocol for Part 2 |
-| Nov – Jan | Scale Part 1 to 30–40 prompts × 3–4 models; complete audit and κ |
-| 11 Dec | HUGS notification. If accepted: SIGSOFT CAPS, ICSE student volunteering, Niagara travel funds |
-| Late Jan | HUGS camera-ready (29 Jan) |
-| Feb | CHI 2027 workshop submission with full Part 1 results |
-| Feb – Mar | Run Part 2 after IRB approval |
-| Mar – Apr | Write and defend thesis |
-| Late Apr | Present at HUGS, Dublin (if accepted) |
+| Mid–late Nov | Submit the IRB protocol for Study 2 |
+| Nov – Jan | Study 1: generate the ≈60–90-sample corpus, run the tool tier, audit, code the residue |
+| 11 Dec | HUGS notification. If accepted: SIGSOFT CAPS, ICSE student volunteering, Niagara travel funds, passport |
+| Late Jan | HUGS camera-ready (29 Jan); build the L3 test items from the Study 1 residue |
+| Feb | CHI 2027 workshop submission (optional) |
+| Feb – Mar | Run Study 2 after IRB approval |
+| Mar – Apr | Write and defend |
 
 ---
 
-## 4. Study design
+## 6. Thesis outline (planned)
 
-### Part 1 — Corpus study (no IRB; core of thesis and HUGS paper)
-
-1. **Prompts.** 30–40 realistic developer requests that force boundary code, phrased without hinting at security. Strata: C-API extension functions (argument parsing, building containers, calling back into Python); ctypes/cffi wrappers passing buffers, strings, arrays; code that raises or propagates Python exceptions from C. Pilot uses 10.
-2. **Generation.** 3–4 current models, *n* samples per prompt. Log everything. The frozen corpus is a released artifact.
-3. **Automated tier.**
-   - ASan/UBSan and Valgrind with fuzzed and edge-case inputs (`None`, empty, huge, wrong type, exception-raising callbacks)
-   - Static analysis: cppcheck, clang-tidy, CodeQL
-   - LLM review: a general LLM, plus `cext-review-toolkit` if usable
-   - Everything scripted and runnable from the command line
-4. **Ground truth.** Manual audit with the codebook. Second coder on ~20%, report κ. A defect counts only if reproduced or both coders agree.
-5. **Residue (RQ1).** Defects missed by every automated tier.
-6. **Literacy coding (RQ2).** Lowest level (L1/L2/L3) at which each residue defect is recognizable. Double-coded, κ reported.
-
-### Part 2 — Review pilot (IRB required; thesis only)
-
-- **Participants:** 30–60 undergraduates, CS1 through seniors. Not recruited from any class the author teaches or grades; advisor or another instructor announces it; anonymous.
-- **Screening:** Danilova et al. C-proficiency questions (as in Khalid et al.); recorded as a covariate.
-- **Instrument:** L1/L2/L3 subscales built from existing work — L1 from SPLASH-E 2017 aliasing quizzes and Kaczmarczyk et al. [SIGCSE 2010]; L2 from Almansoori et al. [SIGCSE 2023] / Lam et al. [SIGCSE 2022] "knowledge of memory" SOLO rubric; L3 new (from Hu & Zhang and Yang & Cai patterns).
-- **Task:** Read-and-review, not write [Fulton et al., SOUPS 2024]. ~12 real defective snippets from Part 1 plus clean controls.
-- **Instructions:** every participant told to review for security [Braz et al., ICSE 2022: ~8× detection effect].
-- **No AI review shown** [Tufano et al., ICSE 2025: anchoring]. Possible future arm.
-- **Confidence** rating per verdict (calibration vs. Perry et al. and Khalid et al.).
-- **Background items:** courses taken; community-college/transfer pathway; where memory management was learned (coursework, job/internship, self-taught).
-- **Analysis:** Poisson regression on defects missed (L1/L2/L3 scores + years of experience, participant random effect); per-defect logistic regression by literacy level; calibration. Reported as a pilot with effect sizes and CIs.
-
-### Defeat conditions (stated in the paper)
-
-- Automation catches almost everything → little residue; case for L2/L3 literacy weakens.
-- L1 predicts detection as well as L3 → GC-level literacy suffices.
-- LLM reviewer alone matches the full tier → human role becomes verifying the verifier.
-- No predictor works → replicates Edmundson et al. and Khalid et al. at the boundary; still reportable.
-
----
-
-## 5. Novelty claim (worded precisely)
-
-The methods are standard. The contribution is the question: connecting what survives automated review to a specific, teachable level of memory-model literacy, at the boundary where most of the scientific and ML Python stack runs.
-
-Say: *"We found no prior evaluation of the security of LLM-generated Python/C API code."* Cite the OMPL bindings study (no benchmark exists for binding generation). Run an ACM DL / IEEE Xplore check before submission.
-
----
-
-## 6. HUGS abstract outline (3 pages incl. refs)
-
-| Section | Budget | Content |
-|---|---|---|
-| Problem | ~0.4 p | AI writes boundary code; review is the human's job; experience doesn't predict detection; the junior apprenticeship is shrinking |
-| Construct | ~0.4 p | L1/L2/L3 table; refcounting is the GC's contract |
-| Pilot | ~0.9 p | ~10 prompts × 2 models; residue after the automated tier; literacy profile; one table |
-| Agenda | ~0.5 p | Full corpus; student review study; defeat conditions; breakout questions |
-| References | ~0.8 p | 12–15 entries |
+1. **Introduction.** The guiding question; pro-AI stance; origin (classmates fluent in libraries but unable to picture what's underneath, told as a story about the system, not the people).
+2. **Background.** Dependency stack (SQ1); memory safety and policy; the Python/C boundary; notional machines; human review of AI code.
+3. **Construct.** L1/L2/L3.
+4. **Study 1.** Corpus, tools, residue.
+5. **Study 2.** Student pilot.
+6. **Discussion.** Who catches the agent's mistakes; the specialists counterargument; curriculum implications (curriculum snapshot).
+7. **Closing reflection.** "You will need AI to compete," dependence vs. augmentation, and transhumanism, drawing on *Magnifica Humanitas* (cite by paragraph number from the printed copy). Keep normative claims clearly separate from findings.
+8. **Limitations and future work.** Everything in the right-hand column of §2.
 
 ---
 
 ## 7. Threats to validity
 
-- **Prompt realism** — phrase prompts from real Stack Overflow / GitHub-issue requests; release them.
-- **Model drift** — freeze and release the corpus; report versions and dates.
-- **Ground truth** — triangulated labels can still miss defects; report κ; treat the residue as a lower bound.
-- **Literacy coding is a judgment** — double-code; publish the codebook with examples.
-- **Pilot generalization** — single institution, small n; reported as a pilot.
-- **Measurement differences** — Yang & Cai report NumPy as 38% native; own measurement found 55.7%. State the counting rule wherever cited.
+- **Prompt realism.** Phrase prompts like real Stack Overflow / GitHub-issue requests; release them.
+- **Model drift.** Freeze and release the corpus; report versions and dates. (Hand collection: the exact version isn't visible, so say so.)
+- **Ground truth.** Labels can still miss defects; treat the residue as a lower bound; rely on reproduction where there's only one coder.
+- **Literacy coding is a judgment.** Publish the codebook with examples; double-code where possible.
+- **Small pilot.** Single institution, small n; report effect sizes and intervals, not significance claims.
+- **Platform.** macOS/arm64 only (no Valgrind); note it.
+- **Measurement differences.** Yang & Cai report NumPy at 38% native; our count is 55.7%. State the counting rule wherever either number is cited.
 
 ---
 
-## 8. Admin and open items
+## 8. Evidence rules
 
-- [ ] Advisor: scope, co-authorship, IRB path, Part 2 recruiter, travel funding
-- [ ] Decide on ICSE SRC (check one-SRC-per-year rule)
-- [ ] ACM student membership (if SRC)
-- [ ] IRB protocol (after HUGS submission)
-- [ ] Travel funding plan if accepted: SIGSOFT CAPS (partial; excludes registration), student volunteering, Niagara funds; passport for Dublin
-- [ ] Library check for prior work before claiming novelty
+- Cite papers, standards and published data. **Don't cite chatbots** (Google AI, ChatGPT, Claude) as sources for claims. Use them for brainstorming only.
+- Novelty wording: "We found no prior evaluation of the security of LLM-generated Python/C API code." Nothing stronger.
+- Differentiate explicitly from Khalid et al. (S&P 2027).
+- Disclose AI assistance as the venue and Niagara require. The AI-generated corpus is labeled as AI-generated, by design.
 
 ---
 
@@ -171,14 +190,15 @@ Say: *"We found no prior evaluation of the security of LLM-generated Python/C AP
 
 1. Khalid et al., S&P 2027 — closest prior art; differentiate explicitly
 2. Yang & Cai, arXiv 2026 — boundary bug taxonomy; codebook
-3. Almansoori et al., SIGCSE 2023 (+ Lam et al. 2022) — closest education work; L2 rubric
-4. Hu & Zhang, SANER 2020 / JSEP 2023 — bug patterns
-5. Sandoval et al., USENIX Security 2023 — counter-finding; reusable C corpus
-6. Perry et al., CCS 2023 — overconfidence baseline
-7. Edmundson et al., ESSoS 2013 — experience doesn't predict review effectiveness
-8. Li, Li & Cai, FSE 2022 — interfacing mechanism drives vulnerability
-9. Braz et al., ICSE 2022; Fulton et al., SOUPS 2024; Tufano et al., ICSE 2025 — Part 2 design choices
+3. Hu & Zhang, SANER 2020 / JSEP 2023 — bug patterns
+4. Almansoori et al., SIGCSE 2023 (+ Lam et al. 2022) — closest education work; L2 items
+5. Sorva, TOCE 2013 — notional machines
+6. Edmundson et al., ESSoS 2013 — experience doesn't predict review effectiveness
+7. Perry et al., CCS 2023; Sandoval et al., USENIX Security 2023 — AI assistants and security
+8. Li, Li & Cai, FSE 2022 — the interfacing mechanism drives vulnerability
+9. Braz et al., ICSE 2022; Fulton et al., SOUPS 2024; Tufano et al., ICSE 2025 — Study 2 design choices
 10. CISA 2023 / ONCD 2024 — policy framing
-11. Lichtinger & Hosseini Maasoum 2025; Brynjolfsson et al. 2025 — junior pipeline
+11. Brynjolfsson et al. 2025; Lichtinger & Hosseini Maasoum 2025 — junior pipeline (correlational; state the caveat)
+12. Firouzi & Ghafari 2026 — why ground truth is triangulated
 
 Full references: see `proposal.md` and `prior-art-review.md`.
