@@ -27,10 +27,42 @@ The two sentences split well. The first gives the premise: high-level code still
 1. **The stack under the language.** CPython, the JavaScript engines in browsers and Node, NumPy and PyTorch native code, OpenSSL, libc. "Memory-safe" apps rest on C/C++. (For NumPy's native-code share, state the counting rule: Yang & Cai say 38%, our own count was 55.7%.)
 2. **Why memory safety keeps coming back.** Microsoft and Chromium both report that about 70% of their serious vulnerabilities are memory-safety bugs. Also the CWE Top 25 and Heartbleed. Policy: the NSA's 2022 memory-safety guidance and the White House ONCD report *Back to the Building Blocks* (Feb 2024).
 3. **What's being done about it, and where each fix falls short.** Moving to memory-safe languages (Google's Android reports on Rust adoption), hardware protections (CHERI, MTE), sanitizers and fuzzing, and AI-driven detection and repair.
+
+   **Answering "just use Rust."** Accept that Rust works, then argue that it isn't the whole answer:
+   - *Rewriting is slow.* Even Google, one of the strongest Rust adopters, writes new code in Rust and leaves most old C/C++ in place. Android's memory-safety share fell below 20% in 2025 (Google 2025) mainly because new code is memory-safe, not because old code was replaced.
+   - *Rust still calls C.* Unsafe Rust is more common than expected, and its main use is calling other unsafe functions, including C (Astrauskas et al. 2020). The same boundary risk shows up in scripting-language native extensions (Staicu et al. 2023).
+   - *Rust code can still have memory bugs.* Google describes nearly shipping its first Rust memory-safety bug (Google 2025).
+
+   Claim: memory-safe languages shrink the problem for new code, but the existing native layer and the boundaries into it still need people who can read C.
+
+   **AI tools have the same limit.** AIxCC systems found 86% and patched 68% of planted bugs (DARPA 2025), and Big Sleep found a SQLite bug before release. But CodeMender's patches are all reviewed by a human before submission. The strongest AI security tools still depend on human experts.
 4. **AI-assisted development and security.** Pearce et al. 2022 ("Asleep at the Keyboard"). Perry et al. 2023: people using AI assistants wrote less secure code but felt more confident. Automation bias.
 5. **Expertise and how it wears away.** Bainbridge, "Ironies of Automation" (1983): the more automated a system gets, the more it depends on rare human skill for the cases automation misses. Add sources on deskilling and on what CS programs teach. The shrinking junior-developer apprenticeship fits here too.
 6. **Synthesis.** Humans who can read and fix native code remain a dependency that tools don't remove. The L1/L2/L3 memory-model literacy construct (managed model / manual model / boundary contract) can organize the argument here, as a framework rather than a study.
+
+   **Central claim: you need to know what's under the abstraction, to a degree.** This counters both "just use Rust" and "let the AI write it." A developer doesn't need to be a C expert, but finding and fixing bugs takes a working mental model of what happens underneath. "To a degree" is what L1/L2/L3 describes: levels of understanding below expertise.
+
+   Possible wording:
+   > *Abstractions, whether a memory-safe language or an AI assistant, reduce how much a developer has to think about, but not how much the system depends on. Finding and fixing bugs at the native layer requires at least a working mental model of what happens beneath the abstraction, even when expert-level knowledge is not required.*
+
+   Support:
+   - *Theory:* notional machines, simplified mental models of what the computer does underneath (see `notes/theoretical-grounding-two-transfers.md`). Spolsky's "Law of Leaky Abstractions" (2002) makes the same point informally; cite it as an essay, not research.
+   - Bainbridge 1983: when automation fails, someone must understand the system well enough to step in.
+   - Lee et al. 2025: limited domain knowledge made it harder for people to check AI output.
+   - Shen & Tamkin 2026: developers who asked the AI for explanations kept their understanding. This is the pro-AI point: the problem is how AI is used, not AI itself.
+   - Prather et al. 2024: struggling students overestimated how well they understood their code.
 7. **Normative close.** The transhumanism section using *Magnifica Humanitas*: keeping this expertise lets people check AI's work, so AI adds to human ability instead of replacing it. Keep the normative claims clearly separate from the literature findings.
+
+## Sources by section
+
+New entries are in `paper/refs.bib` (keys in brackets). Most were checked only against abstracts, official pages and news coverage, so verify figures in the originals.
+
+1. **Stack:** Astrauskas et al. 2020 [astrauskas2020]. *Already in refs.bib:* staicu2023, huzhang2023, yangcai2026, lilicai2022.
+2. **Memory safety:** Microsoft/Miller 2019 [miller2019], Chromium 2020 [chromium2020], ONCD 2024 [oncd2024]. *Already:* cisa2023. Microsoft counted patched CVEs and Chromium counted high-severity bugs, so they're similar findings, not the same measurement.
+3. **Fixes and limits:** Google Android 2025 [google2025rust], DARPA AIxCC 2025 [darpa2025aixcc], DeepMind CodeMender 2025 [deepmind2025codemender]. Use DARPA's corrected AIxCC figures. The 20% and 1000× Android figures were only seen in secondary summaries.
+4. **AI and security:** Lee et al. 2025 [lee2025]. *Already:* pearce2022, perry2023, sandoval2023, khalid2027.
+5. **Expertise:** Bainbridge 1983 [bainbridge1983], Shen & Tamkin 2026 [shentamkin2026], Prather et al. 2024 [prather2024], Becker et al. 2023 [becker2023]. *Already:* almansoori2023, brynjolfsson2025. CS2023 curriculum: check what it says about memory safety before citing.
+6. **Synthesis:** Spolsky 2002 [spolsky2002], plus the section 5 sources.
 
 ## To do
 
@@ -38,3 +70,4 @@ The two sentences split well. The first gives the premise: high-level code still
 - [ ] Decide whether to keep "maintainability" in the thesis statement.
 - [ ] Write the research question into the introduction.
 - [ ] Reconcile `CLAUDE.md`, `thesis-plan.md` and `proposal.md` with the literature-review format.
+- [ ] Confirm the title of arXiv:2601.20245 (Shen & Tamkin) and the full author lists marked "and others" in `refs.bib`.
