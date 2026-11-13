@@ -1,43 +1,49 @@
 # CLAUDE.md — Assembly Required? (Jessica Dye, Niagara University honors thesis)
 
 ## What this project is
-Honors thesis + workshop paper: **"Reviewing What You Never Wrote: Memory-Model Literacy and the Human Review of AI-Generated Code at the Python/C Boundary."**
-Main question: which defects in LLM-generated Python/C boundary code (C-API extensions, ctypes/cffi, exception propagation) survive automated review, and what level of memory-model literacy a human reviewer needs to catch them. Motivation includes the shrinking junior-developer apprenticeship as AI takes over entry-level work.
+Honors thesis, aimed at **HCI / computing education**. Working title: **"Reviewing What You Never Wrote: Memory-Model Literacy and the Human Review of AI-Generated Code at the Python/C Boundary."** (The title may change to fit the literature-review format.)
+
+**Format (updated 13 Nov 2026): a literature review, not an empirical study.** No pilot prompts, corpus study or student pilot will be run for the thesis. Those become a *proposed research agenda*. The thesis is also a pitch: "there is something worth researching here, and I'm the person to do it."
+
+**Central argument (refined 13 Nov):** Software built with high-level languages and AI tools still depends on C and C++. Not every developer needs to understand that layer, but the ecosystem needs enough specialists who do, because someone must be able to check and fix what the tools produce. Education and AI tool design should keep that specialist pipeline alive. **Pro-AI stance:** AI can build understanding, not just replace it, depending on how it's used.
 
 ## Files
-- `thesis-plan.md` — schedule, RQs, week-by-week checklist, deadlines. **Start here.**
-- `proposal.md` — full proposal (design changes from the prior-art review already applied); full reference list.
+- `notes/lit-review-outline-2026-11-12.md` — **start here.** Thesis statement, structure, Rust/GC/AI-tool counterarguments, central claim, proposed research agenda, sources by section.
+- `notes/hugs-3page-outline-2026-11-12.md` — short-abstract outline and trimmed source list. Basis for the CHI SRC submission.
+- `paper/refs.bib` — all references, including those added 12 Nov (some flagged to confirm).
+- `paper/main.tex` — the earlier HUGS draft. **Out of date:** still describes the corpus study and student pilot as planned work.
+- `thesis-plan.md`, `proposal.md` — **out of date** (empirical design). Useful for the research-agenda section and the defeat conditions.
 - `prior-art-review.md` — literature review, closest prior art, intro scaffold.
-- `notes/` — earlier project docs (Aug 2026): the native-core repository studies, the transfer-pathway angle, theoretical grounding (notional machines), the Hu & Zhang digest, lit searches. **Background only — the current design is in thesis-plan.md and proposal.md.** Useful for related work and motivation (e.g., NumPy native share, the Hu & Zhang quote).
+- Other `notes/` files — earlier background docs (Aug 2026): native-core studies, transfer pathway, theoretical grounding (notional machines), Hu & Zhang digest, lit searches.
+- `pipeline/`, `prompts/` — from the dropped empirical plan. Keep for the research agenda; don't extend them.
 
-## Current phase and deadline
-Phase 1: **HUGS 2027 @ ICSE (Dublin)** — 3-page extended abstract, IEEE template, refs count toward the page limit.
-**Due Fri 13 Nov 2026, 23:59 AoE (= Sat 14 Nov, 6:59 AM ET).** Aim to submit 12 Nov. Submit at icse2027-hugs.hotcrp.com.
-Draft is in `paper/main.tex` (3 pages). The corpus study runs Nov–Jan, after HUGS.
-Fallback/follow-on venue: CHI 2027 workshops (Pittsburgh, ~11 Feb 2027). No venue pays travel; SIGSOFT CAPS is partial and doesn't cover registration.
+## Current phase and deadlines
+- **Priority: a decent full thesis draft by December 2026.**
+- **Likely venue: CHI 2027 Student Research Competition (SRC), Pittsburgh, May 10–14, 2027.** Submission due **21 Jan 2027** (check the exact time on the official site), notification 18 Feb. Extended abstract up to 5 pages, references not counted. If selected: attend in person, register for CHI, active ACM student membership. Not yet decided; decide after the December draft.
+- HUGS 2027 @ ICSE (Dublin, due 13 Nov 2026) is **not being pursued**. Attending in person isn't feasible.
 
 ## Settled decisions (don't relitigate without asking)
-- **Scale: undergraduate honors thesis, not a dissertation.** Depth comes from the idea; keep studies small, and put extras in future work (see thesis-plan.md §2). Ask before building tooling.
-- **Guiding question:** "As AI becomes increasingly capable of writing and debugging software, what happens when both the developer and the AI are working with abstractions built on lower-level systems that the developer doesn't understand?" It's answered through SQ1 (native share, done), SQ2 (corpus), and SQ3 (student pilot). Pro-AI stance.
-- HUGS abstract = research plan + motivating example; pilot data optional.
-- Construct: **L1** managed model / **L2** manual model / **L3** boundary contract (new/borrowed/stolen refs, exception state, allocator families). Framing: refcounting *is* CPython's GC.
-- Part 1 = corpus study, no IRB, the core of the HUGS paper. Pilot: 10 prompts × 2 models × 3 samples ≈ 60.
-- Generators: Claude + GPT. LLM reviewer: Gemini (never a generating model).
-- Automated tier: ASan/UBSan + debug CPython 3.12.16, cppcheck, clang-tidy, Gemini review. Valgrind is dropped (no Apple Silicon support); CodeQL is future work. Versions are pinned in `pipeline/requirements.lock`.
-- Codebook from Yang & Cai 2026 taxonomy + Hu & Zhang 2020 bug patterns. Second coder (advisor?) on ~20% if available; otherwise use reproduction-confirmed defects and a single coder. Never an LLM as second coder.
-- Part 2 = IRB student review pilot (~15–30 students), thesis only, after HUGS. Read-and-review task, security instruction for everyone, no AI review shown, confidence ratings, simple stats. The write/optimize-with-AI task is future work.
+- **Scale: undergraduate honors thesis, not a dissertation.** Depth comes from the idea, not volume. Ask before building tooling or launching big research sweeps.
+- **Literature review format.** Don't propose running studies for the thesis. Studies go in the proposed research agenda.
+- **Citation style: APA** for the thesis (confirm with the honors program). A CHI/ACM submission uses that venue's template.
+- **Guiding question:** "As AI becomes increasingly capable of writing and debugging software, what happens when both the developer and the AI are working with abstractions built on lower-level systems that the developer doesn't understand?"
+- **Framework:** **L1** managed model / **L2** manual model / **L3** boundary contract (new/borrowed/stolen refs, exception state, allocator families). Most developers can work at L1 with AI help; the ecosystem needs specialists at L2/L3. Framing: refcounting *is* CPython's GC.
+- **Structure of the argument:** give each abstraction full credit first, then its limits (garbage collection, Rust, AI security tools).
+- **Proposed research agenda:** main study = can AI tools that explain the memory model build L2/L3 understanding (pro-AI hypothesis, with the skeptical view and how to detect it built in). Supporting: does L1/L2/L3 level predict catching boundary bugs; interviews with CPython/NumPy maintainers on how specialists form; optional corpus study as a technical baseline.
+- **Closing section:** pro-AI discussion of transhumanism using *Magnifica Humanitas*. Thesis only, not the short abstract. Keep normative claims clearly separate from what the literature shows.
 - Don't cite chatbots as sources.
-- Ethics: **never recruit from classes Jessica teaches or TAs/grades**; an advisor or another instructor announces the study; responses anonymous.
-
-## Conventions for code in this repo
-- Pin every tool version in the scripts; everything runnable from the command line.
-- Log model name, version, date and temperature for every generated sample. Treat the generated corpus as frozen and releasable — never edit samples in place.
-- Record which tool flagged what, per sample, in a machine-readable file (CSV/JSON).
-- Prompts are written as realistic developer requests (Stack Overflow / GitHub-issue style) and never hint at security.
-- Suggested layout: `prompts/`, `corpus/` (generated samples + metadata), `pipeline/` (generation + analysis scripts), `audit/` (codebook, coder labels, κ), `paper/` (HUGS LaTeX).
+- **Don't criticize or single out Niagara University.** Present the scarcity of C/C++ expertise as a general trend backed by sources, not as a claim about the school.
+- Ethics (if any study is ever run): **never recruit from classes Jessica teaches or TAs/grades**; an advisor or another instructor announces the study; responses anonymous.
 
 ## Writing rules
-- Novelty wording: "We found no prior evaluation of the security of LLM-generated Python/C API code." Don't claim more than that. Do an ACM DL / IEEE Xplore check before submitting.
+- Novelty wording: "We found no prior evaluation of the security of LLM-generated Python/C API code." Don't claim more than that. Do an ACM DL / IEEE Xplore check before submitting anywhere.
 - Differentiate explicitly from Khalid et al. (S&P 2027), the closest prior art.
-- State the defeat conditions (see thesis-plan.md §4).
+- State defeat conditions for the proposed studies (see thesis-plan.md §4).
 - NumPy native-code share: Yang & Cai say 38%, our own count was 55.7%. State the counting rule wherever either number is cited.
+- Verify every figure and citation against the original source. Several `refs.bib` entries added 12 Nov are flagged to confirm.
+- Personal experience (e.g., using AI daily to learn) is motivation, never evidence.
+
+## Conventions for code (only if the research agenda is ever run)
+- Pin every tool version; everything runnable from the command line.
+- Log model name, version, date and temperature for every generated sample. Treat a generated corpus as frozen; never edit samples in place.
+- Prompts are realistic developer requests and never hint at security.

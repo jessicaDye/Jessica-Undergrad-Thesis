@@ -8,6 +8,8 @@
 
 > Although high-level programming languages and AI-assisted development have made software creation increasingly accessible, their reliance on underlying native-code implementations introduces persistent memory-safety challenges. The long-term security and maintainability of these systems depend not only on improvements in automated tools but also on preserving the systems-programming expertise necessary to identify, understand, and remediate vulnerabilities within their underlying C and C++ components.
 
+**Refined central argument (13 Nov):** see section 6. Not every developer needs to understand the C layer, but the ecosystem needs enough specialists who do.
+
 ## Feedback on the statement
 
 The two sentences split well. The first gives the premise: high-level code still depends on C and C++ underneath. The second makes the claim: we still need people with systems-programming expertise.
@@ -40,10 +42,15 @@ The two sentences split well. The first gives the premise: high-level code still
 5. **Expertise and how it wears away.** Bainbridge, "Ironies of Automation" (1983): the more automated a system gets, the more it depends on rare human skill for the cases automation misses. Add sources on deskilling and on what CS programs teach. The shrinking junior-developer apprenticeship fits here too.
 6. **Synthesis.** Humans who can read and fix native code remain a dependency that tools don't remove. The L1/L2/L3 memory-model literacy construct (managed model / manual model / boundary contract) can organize the argument here, as a framework rather than a study.
 
-   **Central claim: you need to know what's under the abstraction, to a degree.** This counters both "just use Rust" and "let the AI write it." A developer doesn't need to be a C expert, but finding and fixing bugs takes a working mental model of what happens underneath. "To a degree" is what L1/L2/L3 describes: levels of understanding below expertise.
+   **Central claim (refined 13 Nov): the ecosystem needs specialists who understand what's under the abstraction.** This counters both "just use Rust" and "let the AI write it." Not every developer needs to understand C. But the system needs enough people who do, because someone must be able to check and fix what the tools produce. The claim is about how expertise is distributed, not about individual programmers, which keeps it pro-AI.
+
+   How L1/L2/L3 fits:
+   - Most developers can work at L1 (managed model) with AI help.
+   - The ecosystem needs a smaller group at L2 (manual model) and L3 (boundary contract) who can check and fix the native layer.
+   - The open question is how that group keeps forming. If junior roles shrink (Brynjolfsson 2025) and automation erodes rarely used skills (Bainbridge 1983), where do the next specialists come from? This is the education angle.
 
    Possible wording:
-   > *Abstractions, whether a memory-safe language or an AI assistant, reduce how much a developer has to think about, but not how much the system depends on. Finding and fixing bugs at the native layer requires at least a working mental model of what happens beneath the abstraction, even when expert-level knowledge is not required.*
+   > *Software built with high-level languages and AI tools still depends on C and C++. Not every developer needs to understand that layer, but the ecosystem needs enough specialists who do, because someone must be able to check and fix what the tools produce. Education and AI tool design should keep that specialist pipeline alive.*
 
    Support:
    - *Theory:* notional machines, simplified mental models of what the computer does underneath (see `notes/theoretical-grounding-two-transfers.md`). Spolsky's "Law of Leaky Abstractions" (2002) makes the same point informally; cite it as an essay, not research.
@@ -51,7 +58,18 @@ The two sentences split well. The first gives the premise: high-level code still
    - Lee et al. 2025: limited domain knowledge made it harder for people to check AI output.
    - Shen & Tamkin 2026: developers who asked the AI for explanations kept their understanding. This is the pro-AI point: the problem is how AI is used, not AI itself.
    - Prather et al. 2024: struggling students overestimated how well they understood their code.
-7. **Normative close.** The transhumanism section using *Magnifica Humanitas*: keeping this expertise lets people check AI's work, so AI adds to human ability instead of replacing it. Keep the normative claims clearly separate from the literature findings.
+7. **Proposed research agenda (added 13 Nov).** The pitch: problem → framework (L1/L2/L3) → studies that would test it. These are proposed for future research, not run in the thesis.
+
+   - **Study 2 (main): Can AI tools build understanding instead of replacing it?** Compare an AI assistant that explains what's happening in memory (refcounts, ownership, which allocator owns what) with one that only writes the code. Measure L2/L3 understanding afterward and on a later delayed test.
+     - *Hypothesis (pro-AI):* AI designed to explain the memory model builds L2/L3 understanding. Shen & Tamkin 2026 support this: developers who asked for explanations kept their understanding.
+     - *Skeptical view, built in:* AI help leads to dependence and weaker skills (Prather et al. 2024, illusion of competence; Lee et al. 2025, less critical thinking with more trust in AI). The study should be able to detect this: if the explaining assistant doesn't beat the plain one, or both groups overestimate their understanding, the skeptics are right for this setting.
+   - **Study 1: Does understanding predict catching bugs?** Compare reviewers at different L1/L2/L3 levels on the same boundary code. This tests the framework directly and answers the counterfactual: what happens when someone *doesn't* understand the code.
+   - **Study 3: How do specialists form today?** Interviews with maintainers of CPython, NumPy or similar projects about how they learned the C layer. Qualitative and feasible, and it speaks to the pipeline question.
+   - **Study 4 (optional): What does AI leave behind at the boundary?** The original corpus study, as a technical baseline.
+
+   Possible motivation line for the introduction (framed as why the question came up, not as evidence): *"I use AI daily to deepen my understanding, which raised the question of when it builds understanding and when it replaces it."*
+
+8. **Normative close.** The transhumanism section using *Magnifica Humanitas*: keeping this expertise lets people check AI's work, so AI adds to human ability instead of replacing it. Keep the normative claims clearly separate from the literature findings.
 
 ## Sources by section
 
