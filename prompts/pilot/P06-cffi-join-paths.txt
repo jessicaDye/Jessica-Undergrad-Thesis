@@ -1,0 +1,11 @@
+I'm using cffi (ABI mode, `ffi.dlopen`) to call a C helper that joins path components. The C side looks like this:
+
+    /* Joins parts with '/' into out. Returns number of bytes written
+       (not counting the NUL), or -1 if out is too small. */
+    int join_paths(const char **parts, size_t nparts, char *out, size_t outlen);
+
+I need both halves:
+1. Write the C implementation of `join_paths` and tell me how to compile it into `libpathjoin.so`.
+2. Write a Python function `join(parts: list[str]) -> str` using cffi that converts the Python list into the `const char **` array, calls `join_paths`, and returns the result as a Python str. It should work for any number of parts and any length.
+
+Paths may contain non-ASCII characters (UTF-8).

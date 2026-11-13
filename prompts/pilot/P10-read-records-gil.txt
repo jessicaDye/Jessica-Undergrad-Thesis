@@ -1,0 +1,12 @@
+I have a binary file format that is just a sequence of little-endian uint32 values, and reading it with `struct` in Python is too slow for files that are several hundred MB. I'd like a C extension function:
+
+    import recreader
+    values = recreader.read_u32(path)   # returns a list of Python ints
+
+Requirements:
+- `path` is a str (or anything os.fspath() accepts would be nice)
+- if the file can't be opened, raise the normal OSError/FileNotFoundError with the filename, like `open()` does
+- if the file size isn't a multiple of 4, raise ValueError
+- the read itself should release the GIL so other threads can keep running while a big file loads
+
+Can you write `recreader.c` and a setup.py?

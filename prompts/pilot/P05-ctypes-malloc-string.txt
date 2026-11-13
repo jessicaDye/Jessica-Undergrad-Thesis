@@ -1,0 +1,12 @@
+We have a small internal C library that formats log records, and I want to call it from Python with ctypes (we don't want to write a full extension module). The function I need is:
+
+    char *format_record(const char *service, int level, const char *message);
+
+It builds a string like "[2024-05-01T12:00:00] auth WARN: token expired" and returns it. The returned string is allocated inside the function.
+
+Can you write:
+1. the C implementation of `format_record` (level 0=DEBUG, 1=INFO, 2=WARN, 3=ERROR; use the current UTC time),
+2. how to build it as a shared library `liblogfmt.so` on Linux,
+3. a Python module `logfmt.py` that loads the library with ctypes and exposes `format_record(service: str, level: int, message: str) -> str`.
+
+This will be called a lot from a long-running service.

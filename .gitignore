@@ -1,0 +1,9 @@
+# secrets: never commit
+.env
+
+# local environments and build output
+.venv/
+__pycache__/
+*.pyc
+runs/build/
+.DS_Store
