@@ -8,6 +8,7 @@ Honors thesis, aimed at **HCI / computing education**. Working title: **"Reviewi
 **Central argument (refined 13 Nov):** Software built with high-level languages and AI tools still depends on C and C++. Not every developer needs to understand that layer, but the ecosystem needs enough specialists who do, because someone must be able to check and fix what the tools produce. Education and AI tool design should keep that specialist pipeline alive. **Pro-AI stance:** AI can build understanding, not just replace it, depending on how it's used.
 
 ## Files
+- `notes/thesis-assembly-plan-2026-11-17.md` — chapter map (claims, sources, word budgets), source gaps, and the writing schedule to a full draft by mid-December.
 - `notes/lit-review-outline-2026-11-12.md` — **start here.** Thesis statement, structure, Rust/GC/AI-tool counterarguments, central claim, proposed research agenda, sources by section.
 - `notes/hugs-3page-outline-2026-11-12.md` — short-abstract outline and trimmed source list. Basis for the CHI SRC submission.
 - `paper/refs.bib` — all references, including those added 12 Nov (some flagged to confirm).
