@@ -51,9 +51,9 @@ The only other working file is a chapter draft: [`draft/ch4-fixes-and-limits.md`
 
 | # | Chapter | Words | Status |
 |---|---|---|---|
-| 1 | Introduction | 1,200 | Write last |
-| 2 | The stack under the language | 1,500 | Material in notes |
-| 3 | Why memory safety keeps coming back | 1,800 | Material in notes; GC sources needed |
+| 1 | Introduction | 1,200 | **Scaffold done:** `draft/ch1-introduction.md` (write last) |
+| 2 | The stack under the language | 1,500 | **Scaffold done:** `draft/ch2-stack-under-the-language.md` |
+| 3 | Why memory safety keeps coming back | 1,800 | **Scaffold done:** `draft/ch3-memory-safety.md`; GC sources needed |
 | 4 | The fixes and where each stops | 2,500 | **Scaffold done:** `draft/ch4-fixes-and-limits.md` |
 | 5 | AI-assisted development and security | 1,800 | Material in notes |
 | 6 | Expertise and how it forms (or erodes) | 2,000 | Material in notes; a few sources needed |
@@ -68,6 +68,8 @@ Chapters 4 and 6 carry the argument and get the most words. If you need to cut, 
 
 ## Chapter 1. Introduction (≈1,200 words, write last)
 
+**Paragraph scaffold: [`draft/ch1-introduction.md`](draft/ch1-introduction.md).**
+
 **Claim:** AI and high-level languages have made software accessible. The stack underneath is still C/C++, and someone has to be able to check it.
 
 - Open with the guiding question and the stakes: memory-safety policy (✅ cisa2023, ✅ oncd2024) and AI writing more code (✅ perry2023).
@@ -80,6 +82,8 @@ Chapters 4 and 6 carry the argument and get the most words. If you need to cut, 
 ---
 
 ## Chapter 2. The stack under the language (≈1,500 words)
+
+**Paragraph scaffold: [`draft/ch2-stack-under-the-language.md`](draft/ch2-stack-under-the-language.md).**
 
 **Claim:** "Memory-safe" software runs on a C/C++ core.
 
@@ -96,6 +100,8 @@ Chapters 4 and 6 carry the argument and get the most words. If you need to cut, 
 ---
 
 ## Chapter 3. Why memory safety keeps coming back (≈1,800 words)
+
+**Paragraph scaffold: [`draft/ch3-memory-safety.md`](draft/ch3-memory-safety.md).**
 
 **Claim:** Memory-safety bugs remain the largest class of serious vulnerabilities; policy has noticed; garbage collection relocates the problem rather than eliminating it.
 
