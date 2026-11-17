@@ -1,5 +1,7 @@
 # HUGS 3-Page Abstract: Outline and Source List
 
+> **Short abstract only (17 Nov 2026):** this outline is for the 3-page HUGS / CHI SRC abstract, so its section numbers don't match the thesis. For the thesis, work from [`thesis-outline.md`](../thesis-outline.md).
+
 *Drafted 12 Nov 2026 with Claude, based on the current HUGS draft in `paper/main.tex`. HUGS is due Fri 13 Nov 2026, 23:59 AoE (Sat 14 Nov, 6:59 AM ET).*
 
 ## Before submitting

@@ -8,9 +8,10 @@ Honors thesis, aimed at **HCI / computing education**. Working title: **"Reviewi
 **Central argument (refined 13 Nov):** Software built with high-level languages and AI tools still depends on C and C++. Not every developer needs to understand that layer, but the ecosystem needs enough specialists who do, because someone must be able to check and fix what the tools produce. Education and AI tool design should keep that specialist pipeline alive. **Pro-AI stance:** AI can build understanding, not just replace it, depending on how it's used.
 
 ## Files
-- `notes/thesis-assembly-plan-2026-11-17.md` — chapter map (claims, sources, word budgets), source gaps, and the writing schedule to a full draft by mid-December.
-- `notes/lit-review-outline-2026-11-12.md` — **start here.** Thesis statement, structure, Rust/GC/AI-tool counterarguments, central claim, proposed research agenda, sources by section.
-- `notes/hugs-3page-outline-2026-11-12.md` — short-abstract outline and trimmed source list. Basis for the CHI SRC submission.
+- `thesis-outline.md` — **start here. The single master outline** (merged 17 Nov): front matter, rules, all 10 chapters with claims, points and sources, source gaps, schedule, open decisions. Update this file rather than creating new outlines.
+- `draft/` — chapter scaffolds and drafts. `draft/ch4-fixes-and-limits.md` is the chapter 4 paragraph scaffold.
+- `notes/lit-review-outline-2026-11-12.md` — superseded by `thesis-outline.md`; kept for history.
+- `notes/hugs-3page-outline-2026-11-12.md` — short-abstract outline (HUGS / CHI SRC only; numbering differs from the thesis).
 - `paper/refs.bib` — all references, including those added 12 Nov (some flagged to confirm).
 - `paper/main.tex` — the earlier HUGS draft. **Out of date:** still describes the corpus study and student pilot as planned work.
 - `thesis-plan.md`, `proposal.md` — **out of date** (empirical design). Useful for the research-agenda section and the defeat conditions.
@@ -21,7 +22,7 @@ Honors thesis, aimed at **HCI / computing education**. Working title: **"Reviewi
 ## Current phase and deadlines
 - **Priority: a decent full thesis draft by December 2026.**
 - **Likely venue: CHI 2027 Student Research Competition (SRC), Pittsburgh, May 10–14, 2027.** Submission due **21 Jan 2027** (check the exact time on the official site), notification 18 Feb. Extended abstract up to 5 pages, references not counted. If selected: attend in person, register for CHI, active ACM student membership. Not yet decided; decide after the December draft.
-- HUGS 2027 @ ICSE (Dublin, due 13 Nov 2026) is **not being pursued**. Attending in person isn't feasible.
+- HUGS 2027 @ ICSE (Dublin): deadline **extended to 20 Nov 2026 AoE**. The advisor is encouraging it; undecided. In-person attendance looks expected but isn't stated, and a HUGS publication might conflict with CHI SRC. Check both.
 
 ## Settled decisions (don't relitigate without asking)
 - **Scale: undergraduate honors thesis, not a dissertation.** Depth comes from the idea, not volume. Ask before building tooling or launching big research sweeps.

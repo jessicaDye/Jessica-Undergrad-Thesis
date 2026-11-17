@@ -1,5 +1,7 @@
 # Literature Review Outline: Thesis Statement and Structure
 
+> **Superseded (17 Nov 2026):** everything here has been merged into [`thesis-outline.md`](../thesis-outline.md), organized by thesis chapter. Work from that file; this one is kept for history.
+
 *Drafted 12 Nov 2026 with Claude. The thesis layout agreed with the advisor by email is mostly a literature review, so pilot prompts aren't strictly needed.*
 
 > **Note:** `CLAUDE.md`, `thesis-plan.md` and `proposal.md` still describe the earlier empirical design (corpus study and student pilot). They should be reconciled with this format.

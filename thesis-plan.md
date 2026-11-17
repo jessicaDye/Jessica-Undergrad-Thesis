@@ -1,5 +1,7 @@
 # Thesis Plan — Reviewing What You Never Wrote
 
+> **Out of date (17 Nov 2026):** this describes the earlier empirical design. The thesis is now a literature review; work from [`thesis-outline.md`](thesis-outline.md). The study designs and defeat conditions here feed chapter 8.
+
 **Memory-Model Literacy and the Human Review of AI-Generated Code at the Python/C Boundary**
 
 Jessica Dye · Niagara University · Honors thesis, defense Spring 2027

@@ -1,5 +1,7 @@
 # Reviewing What You Never Wrote
 
+> **Out of date (17 Nov 2026):** this describes the earlier empirical design. The thesis is now a literature review; work from [`thesis-outline.md`](thesis-outline.md).
+
 ## Memory-Model Literacy and the Human Review of AI-Generated Code at the Python/C Boundary
 
 **Project proposal — undergraduate honors thesis and HUGS 2027 workshop submission**
