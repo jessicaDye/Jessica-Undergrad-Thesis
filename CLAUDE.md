@@ -9,6 +9,7 @@ Honors thesis, aimed at **HCI / computing education**. Working title: **"Reviewi
 
 ## Files
 - `thesis-outline.md` — **start here. The single master outline** (merged 17 Nov): front matter, rules, all 10 chapters with claims, points and sources, source gaps, schedule, open decisions. Update this file rather than creating new outlines.
+- `tools/to_word.py` — makes a Word copy of any outline or chapter in ~/Documents: `python3 tools/to_word.py draft/<file>.md [Name.docx]`. Jessica keeps a Word copy of each chapter as it's worked on.
 - `draft/` — chapter scaffolds and drafts. `draft/ch4-fixes-and-limits.md` is the chapter 4 paragraph scaffold.
 - `notes/lit-review-outline-2026-11-12.md` — superseded by `thesis-outline.md`; kept for history.
 - `notes/hugs-3page-outline-2026-11-12.md` — short-abstract outline (HUGS / CHI SRC only; numbering differs from the thesis).
