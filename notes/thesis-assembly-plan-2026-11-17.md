@@ -8,6 +8,27 @@
 
 ---
 
+## Section numbering across the notes
+
+**This file's chapter numbers are the thesis numbering.** The older outlines number things differently. Use this table to translate.
+
+| Thesis chapter (this plan) | `lit-review-outline-2026-11-12.md` | `hugs-3page-outline-2026-11-12.md` (short abstract) |
+|---|---|---|
+| 1 Introduction | *(new)* | §1 Problem |
+| 2 The stack under the language | §1 | §1 Problem (part) |
+| 3 Why memory safety keeps coming back | §2 | §2 Garbage collection |
+| 4 The fixes and where each stops (**Rust is here**) | §3 | §5 Why better tools don't remove the need |
+| 5 AI-assisted development and security | §4 | §1 Problem (part) |
+| 6 Expertise and how it forms | §5 | §6 Implications; Bainbridge from §5 |
+| 7 Synthesis: L1/L2/L3 | §6 | §3 Construct, §4 Motivating example |
+| 8 Proposed research agenda | §7 | §7 Research agenda |
+| 9 Closing: augmentation, not replacement | §8 | *(thesis only)* |
+| 10 Limitations | *(new)* | *(none)* |
+
+The HUGS §8 ("Questions for the workshop") has no thesis equivalent.
+
+---
+
 ## The one-sentence spine
 
 Every chapter should advance this claim (from the 13 Nov refinement):
