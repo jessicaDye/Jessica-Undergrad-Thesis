@@ -2,7 +2,7 @@
 
 **This is the one file to work from.** Merged 17 Nov 2026 from three files: the lit-review outline (12–13 Nov), the HUGS short-abstract outline (12–13 Nov) and the assembly plan (17 Nov). Those older files are still in `notes/` for history, but everything you need from them is here, organized by thesis chapter.
 
-The only other working file is a chapter draft: [`draft/ch4-fixes-and-limits.md`](draft/ch4-fixes-and-limits.md), the paragraph-by-paragraph scaffold for chapter 4. New chapter scaffolds and drafts go in `draft/` as they're written.
+Every chapter now has a working file in `draft/`: paragraph scaffolds for chapters 1–6 and 8, a lighter outline for chapters 7 and 9, and a checklist for chapter 10. Chapter drafts go in `draft/` as they're written.
 
 **Legend:** ✅ in `paper/refs.bib` · ➕ needs adding to `refs.bib` · ⚠️ verify the figure or detail against the original
 
@@ -55,12 +55,12 @@ The only other working file is a chapter draft: [`draft/ch4-fixes-and-limits.md`
 | 2 | The stack under the language | 1,500 | **Scaffold done:** `draft/ch2-stack-under-the-language.md` |
 | 3 | Why memory safety keeps coming back | 1,800 | **Scaffold done:** `draft/ch3-memory-safety.md`; GC sources needed |
 | 4 | The fixes and where each stops | 2,500 | **Scaffold done:** `draft/ch4-fixes-and-limits.md` |
-| 5 | AI-assisted development and security | 1,800 | Material in notes |
-| 6 | Expertise and how it forms (or erodes) | 2,000 | Material in notes; a few sources needed |
-| 7 | Synthesis: memory-model literacy (L1/L2/L3) | 1,500 | Framework settled |
-| 8 | Proposed research agenda | 1,200 | Designs settled |
-| 9 | Closing: augmentation, not replacement | 1,200 | Not started |
-| 10 | Limitations | 400 | Not started |
+| 5 | AI-assisted development and security | 1,800 | **Scaffold done:** `draft/ch5-ai-assisted-development.md` |
+| 6 | Expertise and how it forms (or erodes) | 2,000 | **Scaffold done:** `draft/ch6-expertise.md`; a few sources needed |
+| 7 | Synthesis: memory-model literacy (L1/L2/L3) | 1,500 | **Outline done:** `draft/ch7-synthesis-l1-l2-l3.md` (write after 2–6) |
+| 8 | Proposed research agenda | 1,200 | **Scaffold done:** `draft/ch8-research-agenda.md` |
+| 9 | Closing: augmentation, not replacement | 1,200 | **Outline done:** `draft/ch9-closing.md` (prompts, not topic sentences) |
+| 10 | Limitations | 400 | **Checklist done:** `draft/ch10-limitations.md` (write last, before ch. 1) |
 
 Chapters 4 and 6 carry the argument and get the most words. If you need to cut, trim chapters 2 and 3 first.
 
@@ -145,6 +145,8 @@ Chapters 4 and 6 carry the argument and get the most words. If you need to cut, 
 
 ## Chapter 5. AI-assisted development and security (≈1,800 words)
 
+**Paragraph scaffold: [`draft/ch5-ai-assisted-development.md`](draft/ch5-ai-assisted-development.md).**
+
 **Claim:** AI-written code has security flaws at measurable rates, people trust it too much, and human review is the safeguard, but reviewing code you didn't write is hard.
 
 - AI assistants produce insecure code. ✅ pearce2022 ("Asleep at the Keyboard"), ✅ sandoval2023
@@ -163,6 +165,8 @@ Chapters 4 and 6 carry the argument and get the most words. If you need to cut, 
 ---
 
 ## Chapter 6. Expertise and how it forms (or erodes) (≈2,000 words)
+
+**Paragraph scaffold: [`draft/ch6-expertise.md`](draft/ch6-expertise.md).**
 
 **Claim:** Automation depends on rare human skill for the cases it misses; the routes into that skill are narrowing; AI can build or erode it depending on how it's used.
 
@@ -187,6 +191,8 @@ Chapters 4 and 6 carry the argument and get the most words. If you need to cut, 
 
 ## Chapter 7. Synthesis: memory-model literacy, L1/L2/L3 (≈1,500 words)
 
+**Outline: [`draft/ch7-synthesis-l1-l2-l3.md`](draft/ch7-synthesis-l1-l2-l3.md).**
+
 **Claim:** Chapters 2–6 point to a specific gap in understanding, which this framework names. Most developers can work at L1 with AI help; the ecosystem needs a smaller group at L2/L3.
 
 | Level | What the reader understands | Example question |
@@ -207,6 +213,8 @@ Chapters 4 and 6 carry the argument and get the most words. If you need to cut, 
 ---
 
 ## Chapter 8. Proposed research agenda (≈1,200 words)
+
+**Paragraph scaffold: [`draft/ch8-research-agenda.md`](draft/ch8-research-agenda.md).**
 
 **Claim:** The framework is testable, and here's how. These studies are proposed for future research, not run in the thesis. This chapter is also the pitch: "there is something worth researching here, and I'm the person to do it."
 
@@ -230,6 +238,8 @@ Chapters 4 and 6 carry the argument and get the most words. If you need to cut, 
 
 ## Chapter 9. Closing: augmentation, not replacement (≈1,200 words)
 
+**Outline: [`draft/ch9-closing.md`](draft/ch9-closing.md).**
+
 **Claim (normative, labeled as such):** keeping this expertise is what lets people check AI's work, so AI augments human ability instead of replacing it.
 
 - "You will need AI to compete" can slide into dependence or learned helplessness; the pro-AI answer is literacy that keeps humans able to verify.
@@ -240,6 +250,8 @@ Chapters 4 and 6 carry the argument and get the most words. If you need to cut, 
 ---
 
 ## Chapter 10. Limitations (≈400 words)
+
+**Checklist: [`draft/ch10-limitations.md`](draft/ch10-limitations.md).**
 
 - A literature review, not an empirical test; the framework is proposed, not validated.
 - A fast-moving field: AI capability figures (AIxCC, Android) date quickly, and several key sources are preprints.
@@ -290,7 +302,7 @@ Chapters 4 and 6 carry the argument and get the most words. If you need to cut, 
 
 | File | Status |
 |---|---|
-| `draft/ch4-fixes-and-limits.md` | **Active.** Chapter 4 scaffold |
+| `draft/ch1-…` to `draft/ch10-…` | **Active.** One working file per chapter |
 | `paper/refs.bib` | **Active.** All references |
 | `notes/lit-review-outline-2026-11-12.md` | Superseded by this file; kept for history |
 | `notes/hugs-3page-outline-2026-11-12.md` | Only for the short HUGS/CHI abstract, not the thesis |
