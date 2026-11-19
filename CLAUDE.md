@@ -14,7 +14,7 @@ Honors thesis, aimed at **HCI / computing education**. Working title: **"Reviewi
 - `notes/lit-review-outline-2026-11-12.md` — superseded by `thesis-outline.md`; kept for history.
 - `notes/hugs-3page-outline-2026-11-12.md` — short-abstract outline (HUGS / CHI SRC only; numbering differs from the thesis).
 - `paper/refs.bib` — all references, including those added 12 Nov (some flagged to confirm).
-- `paper/main.tex` — the earlier HUGS draft. **Out of date:** still describes the corpus study and student pilot as planned work.
+- `paper/main.tex` — HUGS 2027 3-page abstract, rewritten 19 Nov as a position / research-agenda paper (branch `hugs-2027-abstract`). Build with `tectonic main.tex`. Its header lists what to check before submitting. The older empirical version is in git history.
 - `thesis-plan.md`, `proposal.md` — **out of date** (empirical design). Useful for the research-agenda section and the defeat conditions.
 - `prior-art-review.md` — literature review, closest prior art, intro scaffold.
 - Other `notes/` files — earlier background docs (Aug 2026): native-core studies, transfer pathway, theoretical grounding (notional machines), Hu & Zhang digest, lit searches.
@@ -23,7 +23,7 @@ Honors thesis, aimed at **HCI / computing education**. Working title: **"Reviewi
 ## Current phase and deadlines
 - **Priority: a decent full thesis draft by December 2026.**
 - **Likely venue: CHI 2027 Student Research Competition (SRC), Pittsburgh, May 10–14, 2027.** Submission due **21 Jan 2027** (check the exact time on the official site), notification 18 Feb. Extended abstract up to 5 pages, references not counted. If selected: attend in person, register for CHI, active ACM student membership. Not yet decided; decide after the December draft.
-- HUGS 2027 @ ICSE (Dublin): deadline **extended to 20 Nov 2026 AoE**. The advisor is encouraging it; undecided. In-person attendance looks expected but isn't stated, and a HUGS publication might conflict with CHI SRC. Check both.
+- HUGS 2027 @ ICSE (Dublin): deadline **extended to 20 Nov 2026 AoE**. The advisor is encouraging it; a draft is ready (19 Nov) but submission is still undecided. In-person attendance looks expected but isn't stated, and a HUGS publication might conflict with CHI SRC. Check both.
 
 ## Settled decisions (don't relitigate without asking)
 - **Scale: undergraduate honors thesis, not a dissertation.** Depth comes from the idea, not volume. Ask before building tooling or launching big research sweeps.

@@ -1,10 +1,20 @@
-% HUGS 2027 @ ICSE -- 3-page extended abstract, references included in the limit.
-% Build: tectonic main.tex   (or upload main.tex + refs.bib to Overleaf)
-% TODO before submitting:
-%   - Check the HUGS CFP for anonymity rules (remove the author block if double-blind).
-%   - Check the CFP and Niagara policy on disclosing AI assistance; add a line if required.
-%   - Confirm preprint status of khalid2027, yangcai2026, ompl2026, firouzi2026.
-%   - Run the ACM DL / IEEE Xplore novelty check (log the queries).
+% HUGS 2027 @ ICSE -- 3-page extended abstract, references INCLUDED in the 3 pages.
+% Single-anonymous: author names and affiliations stay visible.
+% Due Fri 20 Nov 2026, AoE (UTC-12) -- about 8 AM Sat 21 Nov, Eastern. Submit at https://icse2027-hugs.hotcrp.com/
+% Build: cd paper && tectonic main.tex   (or upload main.tex + refs.bib to Overleaf)
+%
+% Rewritten 19 Nov 2026 as a position / research-agenda abstract (the CFP explicitly
+% invites "position or vision papers" and "research agendas"). The earlier version
+% with the corpus study and student pilot is in git history (commit 8b9a1d0).
+%
+% MUST DO before submitting:
+%   - refs.bib: shentamkin2026 still has a TODO title -- it would print in the references.
+%   - Check figures against the originals: AIxCC 54/63 found, 43 patched (DARPA);
+%     Yang & Cai 41.7% / 31.5%; Brynjolfsson 16%; NumPy 55.7% / CPython 47.4% (our count).
+%   - Confirm titles flagged in refs.bib: miller2019 (not cited here), deepmind2025codemender.
+%   - Add department / advisor to the author block if co-authoring.
+%   - Check the HUGS CFP and Niagara's policy on disclosing AI assistance.
+%   - Ask the organizers or your advisor about in-person vs. remote presentation.
 \documentclass[conference]{IEEEtran}
 \usepackage{cite}
 \usepackage{booktabs}
@@ -16,32 +26,33 @@
 
 \begin{document}
 
-\title{Reviewing What You Never Wrote: Memory-Model Literacy and the Human Review of AI-Generated Code at the Python/C Boundary}
+\title{Reviewing What You Never Wrote: Memory-Model Literacy and the Limits of Abstraction at the Python/C Boundary}
 
 \author{\IEEEauthorblockN{Jessica Dye}
 \IEEEauthorblockA{Niagara University\\
 Niagara University, NY, USA}}
-% TODO: add department; add advisor if co-authoring.
 
 \maketitle
 
 \begin{abstract}
-As AI becomes increasingly capable of writing and debugging software, what happens when both the developer and the AI are working with abstractions built on lower-level systems that the developer doesn't understand? We take a pro-AI position: the question is not whether to use these tools, but what human understanding is needed to oversee them. The Python libraries that AI and scientific computing rely on are built on C, and that C is increasingly written by AI. We study the seam where the question is sharpest: code that crosses the Python/C memory-management boundary. There, reference counting \emph{is} CPython's garbage collector, and the collector's bookkeeping becomes the programmer's job. We propose a three-level construct of memory-model literacy (managed, manual, and boundary-contract) and a two-part study. First, a corpus study asks which defects in LLM-generated boundary code survive sanitizers, static analysis, and LLM review. Second, a student study asks whether literacy at each level predicts catching those defects better than years of experience does. A motivating example shows a dangling-reference bug that two standard static analyzers do not flag.
+As AI becomes increasingly capable of writing and debugging software, what happens when both the developer and the AI are working with abstractions built on lower-level systems that the developer doesn't understand? High-level languages, memory-safe languages, and AI tools make software easier to write, but the Python stack that AI itself runs on still rests on C and C++. We argue from the literature that not every developer needs to understand that layer, but the ecosystem needs enough specialists who do, because someone must be able to check and fix what the tools produce. We propose three levels of memory-model literacy (managed, manual, and boundary contract), show why better languages and AI security tools move the human role rather than remove it, and outline a research agenda whose main question is pro-AI: can AI tools that explain the memory model build the understanding they might otherwise erode?
 \end{abstract}
 
 \section{Problem}
 
-\textbf{The abstraction runs on C.} Students increasingly learn computing through Python, but the stack they use is largely native code. By our count, 55.7\% of NumPy's source lines are C/C++ and 47.4\% of CPython's (lines classified by file extension, vendored code excluded). Yang and Cai report 38\% for NumPy under their own counting rule~\cite{yangcai2026}; under either rule the native core is substantial. Memory-safety defects remain the most prevalent class of disclosed vulnerability in memory-unsafe code~\cite{cisa2023}. Vulnerability proneness in multilingual code tracks the interfacing mechanism, not just the language~\cite{lilicai2022}.
+\textbf{The abstraction runs on C.} Python is many developers' first language, but the stack they use is largely native code. By our count, 55.7\% of NumPy's source lines are C/C++ and 47.4\% of CPython's (lines classified by file extension, vendored code excluded); Yang and Cai report 38\% for NumPy under their own counting rule~\cite{yangcai2026}. Memory-safety defects remain the most prevalent class of disclosed vulnerability in memory-unsafe code~\cite{cisa2023}.
 
-\textbf{The seam is where it breaks.} In a study of 216 native-code bugs in Python applications, reference counting was involved in 41.7\%, and foreign-object handling and cross-language exception handling in 31.5\% each~\cite{yangcai2026}. These are not ordinary C mistakes. They are violations of a contract between C code and the Python runtime: which references are new, borrowed, or stolen; when an exception is set; which allocator owns which memory~\cite{huzhang2023}.
+\textbf{The boundary is where it breaks.} In a study of 216 native-code bugs in Python applications, reference counting was involved in 41.7\%, and foreign-object handling and cross-language exception handling in 31.5\% each~\cite{yangcai2026}. These are violations of a contract between C code and the Python runtime: which references are new, borrowed, or stolen; when an exception is set; which allocator owns which memory~\cite{huzhang2023}.
 
-\textbf{That code is increasingly written by AI, and reviewed by humans who may not know the contract.} LLM-generated C has well-documented memory-safety defects~\cite{pearce2022}, though results on human-plus-AI code are mixed~\cite{sandoval2023}. Developers using AI assistants can write less secure code while feeling more confident~\cite{perry2023}. Human review is the stated safeguard, but it is weak: experience did not predict security-review effectiveness~\cite{edmundson2013}. In the closest prior work, 100 developers could not reliably distinguish secure from insecure AI-generated C, and more experienced developers submitted \emph{more} vulnerabilities~\cite{khalid2027}. Meanwhile, the junior roles where developers traditionally learned this contract under review are contracting. Brynjolfsson et al.\ report a 16\% relative employment decline for 22--25-year-olds in AI-exposed occupations~\cite{brynjolfsson2025}. The causes are contested, and we claim no more than that this pathway is under pressure.
+\textbf{More of this code is written by AI and reviewed by humans.} LLM-generated C has documented memory-safety defects~\cite{pearce2022}, though results for human-plus-AI code are mixed~\cite{sandoval2023}, and developers using assistants can write less secure code while feeling more confident~\cite{perry2023}. In the closest prior work, developers could not reliably tell secure from insecure AI-generated C, and experience did not help~\cite{khalid2027}. Meanwhile the junior roles where developers learned the contract under review are under pressure: Brynjolfsson et al.\ report a 16\% relative employment decline for 22--25-year-olds in AI-exposed occupations~\cite{brynjolfsson2025}, though the causes are contested.
 
-\textbf{Gap.} Prior human studies measured \emph{experience} and found it wanting. Prior education work linked students' knowledge of memory to \emph{writing} secure C~\cite{almansoori2023}. We found no prior evaluation of the security of LLM-generated Python/C API code; a 2026 study of LLM-generated bindings notes that no benchmark for binding generation exists~\cite{ompl2026}. Nobody has asked what a reviewer must understand to catch what AI leaves at the boundary.
+\textbf{Gap.} We found no prior evaluation of the security of LLM-generated Python/C API code; a 2026 study of LLM-generated bindings notes that no benchmark for binding generation exists~\cite{ompl2026}. Prior work asks whether \emph{experience} predicts review quality. Nobody has asked what a reviewer must \emph{understand} to catch what tools leave behind at the boundary.
 
-\textbf{Guiding question.} \emph{As AI becomes increasingly capable of writing and debugging software, what happens when both the developer and the AI are working with abstractions built on lower-level systems that the developer doesn't understand?} We answer it in three parts. \textbf{SQ1:} How much of the Python AI and scientific stack is built on native code? \textbf{SQ2:} Which defects in AI-generated Python/C code do automated tools, AI reviewers included, miss? \textbf{SQ3:} Does a developer's understanding of the memory model predict whether they catch what the tools miss? SQ1 is answered above by our repository counts; SQ2 and SQ3 are the studies in Section~IV.
+\section{What Garbage Collection Solves, and Where It Stops}
 
-\section{Construct: Three Levels of Memory-Model Literacy}
+Garbage collection deserves full credit. It removes use-after-free and double-free from managed code, makes programming far more accessible, and is what makes memory-safe languages practical. But its guarantees hold only for memory the runtime knows about. At the C boundary the bookkeeping is done by hand: reference counting \emph{is} CPython's garbage collector, and every extension must keep its counts correct. The collector is itself written in C, and native extensions void the managed guarantees~\cite{staicu2023}. Garbage collection does not eliminate memory-related vulnerabilities; it relocates them, to a layer most Python developers never see.
+
+\section{Three Levels of Memory-Model Literacy}
 
 \begin{table}[t]
 \caption{Levels of memory-model literacy}
@@ -58,7 +69,7 @@ L3 Boundary & The collector's guarantees and the obligations C code takes on to 
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:levels} defines the construct. It targets a common misconception: that a garbage-collected language makes memory someone else's problem. Garbage collection does not eliminate memory-related vulnerabilities; it relocates them. Its guarantees hold only for code that stays inside the managed runtime, and native extensions void them~\cite{staicu2023}. Our hypothesis: the defects that survive automated review are dominated by L3, and L3 depends on L2 and cannot be inferred from L1 alone. If so, students who only ever see a managed language are missing exactly the knowledge needed to review the code their tools are built from.
+Table~\ref{tab:levels} proposes a framework built from this literature. Our central claim is that most developers can work productively at L1 with AI help, but the ecosystem needs a smaller group of specialists at L2 and L3. We also argue that L3 depends on L2 and cannot be inferred from L1 alone, so a developer who has only ever seen a managed language is missing exactly the knowledge needed to review the code their tools are built from.
 
 \section{Motivating Example}
 
@@ -70,23 +81,31 @@ PyTuple_SET_ITEM(t, 0, PyList_GET_ITEM(lst, 0));
 return t;   /* missing Py_INCREF on the item */
 \end{lstlisting}
 
-\texttt{PyList\_GET\_ITEM} returns a \emph{borrowed} reference; \texttt{PyTuple\_SET\_ITEM} \emph{steals} one. When the tuple is freed, the item's count drops below what the list expects, leaving the list holding a dangling pointer. The code compiles cleanly and looks idiomatic. Neither cppcheck~2.22 (\texttt{--enable=all}) nor clang-tidy~23.1 (all checks) reported the defect; clang-tidy emitted only style warnings. On a release build of CPython~3.13 the program crashed with a bus error and no diagnostic. Only a debug build of CPython (negative-refcount assertion) and AddressSanitizer, given the right input, exposed it. Recognizing the bug from the source requires L3: knowing which calls borrow and which steal.
+\texttt{PyList\_GET\_ITEM} returns a \emph{borrowed} reference; \texttt{PyTuple\_SET\_ITEM} \emph{steals} one. When the tuple is freed, the item's count drops below what the list expects, leaving the list with a dangling pointer. The code compiles cleanly and looks idiomatic. Neither cppcheck~2.22 nor clang-tidy~23.1 reported it, and a release build of CPython~3.13 crashed with no diagnostic. Only a debug CPython build and AddressSanitizer, given the right input, exposed it. Spotting it in the source takes L3: knowing which calls borrow and which steal. This is one hand-written example, not evidence about AI.
 
-This is one hand-written example, not evidence about AI. Whether LLMs produce such defects, how often, and whether a full automated tier misses them is the empirical question.
+\section{Why Better Tools Don't Remove the Need}
 
-\section{Research Plan}
+\textbf{Memory-safe languages.} Android's shift to writing new code in Rust sharply reduced its share of memory-safety vulnerabilities~\cite{google2025rust}. But rewriting is slow, so existing C stays; real Rust code uses \texttt{unsafe}, often to call other unsafe code, including C libraries~\cite{astrauskas2020}; and every memory-safety CVE in a study of Rust's CVEs required \texttt{unsafe} code~\cite{xu2021}. Someone must still reason correctly about the unsafe parts.
 
-\textbf{Study 1: Corpus (SQ2).} We ask which defects survive the combined automated tier, and, for each survivor, the lowest literacy level at which it is recognizable. Realistic developer requests, phrased like Stack Overflow questions with no security hints, that require C-API extensions, ctypes/cffi wrappers, or exception propagation from C. We have written ten pilot prompts. Each prompt goes to two current models (Claude and GPT), three samples each, logging model version and date; the corpus is frozen and released. The automated tier combines AddressSanitizer/UBSan and a debug CPython under edge-case inputs, cppcheck and clang-tidy, and an LLM reviewer from a vendor other than the generating model. Ground truth is a manual audit with a codebook drawn from Yang and Cai's taxonomy~\cite{yangcai2026} and Hu and Zhang's bug patterns~\cite{huzhang2023}. Because static analyzers agree with human labels on only about 61--65\% of samples~\cite{firouzi2026}, labels are triangulated: a defect counts if a sanitizer or assertion reproduces it, or if two coders agree. The \emph{residue} is every defect missed by all tools; each is coded L1, L2, or L3.
+\textbf{AI security tools.} In DARPA's AI Cyber Challenge finals, autonomous systems found 54 of 63 planted vulnerabilities and patched 43~\cite{darpa2025aixcc}, a real advance. Yet a large share was solvable by fuzzing alone, patches that passed automated checks still needed manual review, and DeepMind's CodeMender has a human review every patch before it goes upstream~\cite{deepmind2025codemender}.
 
-\textbf{Study 2: Students (SQ3, IRB pending).} We ask whether L1/L2/L3 scores predict detection better than years of experience does, and how well calibrated students' confidence is. About 15--30 undergraduates, from CS1 through senior year, take a short literacy test, then review real defective snippets from the residue plus clean controls. Following prior method work, the task is reading rather than writing~\cite{fulton2024}, every participant is told to look for security problems~\cite{braz2022}, and no AI review is shown. Participants rate their confidence in each verdict. We report detection by literacy level, how strongly literacy scores and years of experience each track detection, and calibration, as a pilot with effect sizes. A task closer to practice, where participants use an AI assistant to speed up a slow Python routine in C and we test what they ship~\cite{sandoval2023}, is future work.
+\textbf{The irony of automation.} Each fix moves the human from writing code to verifying it. Bainbridge's ironies of automation predict the consequence: the more automated a system, the more it depends on rare human skill for the cases automation misses, and the harder that skill is to keep~\cite{bainbridge1983}. Our claim is not that humans find bugs better than machines; it is that someone must be able to judge the findings and the fixes.
 
-\textbf{Defeat conditions.} The hypothesis fails if (1) automation catches nearly everything, leaving little residue; (2) L1 predicts detection as well as L3; (3) the LLM reviewer alone matches the full tier, reducing the human role to verifying the verifier; or (4) no predictor works, replicating \cite{edmundson2013,khalid2027} at the boundary. Each is still a reportable result for curriculum design.
+\section{Implications for Education and Tool Design}
 
-\textbf{Difference from closest prior work.} Khalid et al.~\cite{khalid2027} study plain C and use experience as the predictor. We target the cross-language boundary, characterize what automation leaves behind, and test a specific, teachable construct instead of experience.
+How AI is used matters. In a randomized study, developers who asked an AI assistant for explanations kept more of their understanding than those who delegated the work~\cite{shentamkin2026}. The risks are also documented: struggling novices overestimate what they understand~\cite{prather2024}, higher trust in AI goes with less critical thinking~\cite{lee2025}, and students' memory knowledge shapes whether they write secure C~\cite{almansoori2023}. If junior roles shrink and rarely used skills erode, where do the next L2/L3 specialists come from? We ask how AI tools and courses can keep that pipeline alive instead of replacing it.
+
+\section{Proposed Research Agenda}
+
+\textbf{Main study: can AI tools build understanding?} Compare an assistant that explains the memory model with one that only writes code, and measure L2/L3 understanding afterward. Our hypothesis is pro-AI: explaining assistants build understanding. The skeptical view, that AI help produces dependence and overconfidence~\cite{prather2024,lee2025}, is built in: if the explaining assistant does no better, the skeptics are right for this setting.
+
+\textbf{Supporting studies.} (1) Does L1/L2/L3 level predict catching boundary bugs better than years of experience, which prior work found wanting~\cite{khalid2027}? (2) How do specialists form? Interviews with CPython and NumPy maintainers.
+
+\textbf{What would prove us wrong.} The framework fails if L1 predicts detection as well as L3, if automated tools catch nearly every boundary defect, or if no measure of understanding predicts detection at all. Each outcome would still inform curriculum design.
 
 \section{Questions for the Workshop}
 
-(1) Is a three-level construct the right grain, or should L3 be split, for example into reference ownership and exception state? (2) How can a literacy test avoid simply rewarding students who have taken a systems course? (3) Which automated tools would reviewers consider the minimum credible tier?
+(1) Is three levels the right grain, or should L3 split into reference ownership and exception state? (2) How can a literacy measure avoid simply rewarding students who took a systems course? (3) What would convince practitioners that an AI tool builds understanding rather than dependence?
 
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
